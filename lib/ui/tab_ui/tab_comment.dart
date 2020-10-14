@@ -20,31 +20,42 @@ class _TabCommentState extends State<TabComment>
     serviceInfo = ServiceData().loadInfo();
   }
 
+  var x;
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     var textScale = MediaQuery.of(context).textScaleFactor;
 
-    return FutureBuilder<List<Comment>>(
-      future: serviceInfo,
-      builder: (context, snapshot) {
-        return snapshot.hasData
-            ? ListView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                //primary: true,
-                // padding: EdgeInsets.zero,
-                itemCount: snapshot.data.length,
-                itemBuilder: (context, i) {
-                  //Comment data = allComment[i];
-                  return Card(
-                    child: ListTile(
-                      title: Text(snapshot.data[i].ad),
-                    ),
-                  );
-                },
-              )
-            : CircularProgressIndicator();
+    return x == null
+        ? FutureBuilder<List<Comment>>(
+            future: ServiceData().loadInfo(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData && snapshot.data != null) {
+                x = snapshot.data;
+                return loadBody();
+              }
+
+              return CircularProgressIndicator();
+            },
+          )
+        : loadBody();
+  }
+
+  Widget loadBody() {
+    return ListView.builder(
+      physics: NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      //primary: true,
+      // padding: EdgeInsets.zero,
+      itemCount: x.length,
+      itemBuilder: (context, index) {
+        
+        return Card(
+          child: ListTile(
+            title: Text(x[index].ad),
+          ),
+        );
       },
     );
   }
