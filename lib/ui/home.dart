@@ -1,6 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:general_polad/ui/home_page.dart';
 import 'package:general_polad/ui/photos_page.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -40,39 +43,47 @@ class _HomeState extends State<Home> {
         onPageChanged: _onPageChanged,
         physics: NeverScrollableScrollPhysics(),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        type: BottomNavigationBarType.fixed,
-        onTap: _onItemTapped,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.home,
-              color: _selectedIndex == 0 ? Colors.deepPurple[400] : Colors.grey,
-            ),
-            title: Text(
-              'Home',
-              style: TextStyle(
-                color:
-                    _selectedIndex == 0 ? Colors.deepPurple[400] : Colors.grey,
+      bottomNavigationBar: Theme(
+        data: ThemeData(
+          disabledColor: Colors.transparent,
+          focusColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          splashColor: Colors.transparent,
+          visualDensity: VisualDensity(horizontal: 2, vertical: 2),
+        ),
+        child: BottomNavigationBar(
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          type: BottomNavigationBarType.fixed,
+          onTap: _onItemTapped,
+          items: [
+            BottomNavigationBarItem(
+              icon: ImageIcon(
+                AssetImage("icons/icon1.png"),
+                color: _selectedIndex == 0 ? Colors.blue[400] : Colors.grey,
+              ),
+              title: Text(
+                'Home',
+                style: TextStyle(
+                  color: _selectedIndex == 0 ? Colors.blue[400] : Colors.grey,
+                ),
               ),
             ),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.search,
-              color: _selectedIndex == 1 ? Colors.deepPurple[400] : Colors.grey,
-            ),
-            title: Text(
-              'Search',
-              style: TextStyle(
-                color:
-                    _selectedIndex == 1 ? Colors.deepPurple[400] : Colors.grey,
+            BottomNavigationBarItem(
+              icon: ImageIcon(
+                 AssetImage("icons/icon2.png"),
+                color: _selectedIndex == 1 ? Colors.blue[400] : Colors.grey,
+              ),
+              title: Text(
+                'Photo',
+                style: TextStyle(
+                  color: _selectedIndex == 1 ? Colors.blue[400] : Colors.grey,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

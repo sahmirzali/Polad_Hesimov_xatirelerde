@@ -1,8 +1,17 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:general_polad/ui/about.dart';
+import 'package:general_polad/ui/pdf_black/pdf_black.dart';
+import 'package:general_polad/ui/pdf_white/pdf_white.dart';
 import 'package:general_polad/ui/tab_ui/tab_about.dart';
 import 'package:general_polad/ui/tab_ui/tab_comment.dart';
+import 'package:path_provider/path_provider.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -13,6 +22,47 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  String whitepathPDF = "";
+  String blackpathPDF = "";
+  
+
+  
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_handleTabSelection);
+    fromAsset('pdf_asset/pdfwhite.pdf', 'pdfwhite.pdf').then((f) {
+      setState(() {
+        whitepathPDF = f.path;
+      });
+    });
+     fromAsset('pdf_asset/pdfblack.pdf', 'pdfblack.pdf').then((f) {
+      setState(() {
+        blackpathPDF = f.path;
+      });
+    });
+  }
+
+  Future<File> fromAsset(String asset, String filename) async {
+    // To open from assets, you can copy them to the app storage folder, and the access them "locally"
+    Completer<File> completer = Completer();
+
+    try {
+      var dir = await getApplicationDocumentsDirectory();
+      File file = File("${dir.path}/$filename");
+      var data = await rootBundle.load(asset);
+      var bytes = data.buffer.asUint8List();
+      await file.writeAsBytes(bytes, flush: true);
+      completer.complete(file);
+    } catch (e) {
+      throw Exception('Error parsing asset file!');
+    }
+
+    return completer.future;
+  }
+
   final List<Widget> myTabs = [
     Tab(
       text: '  Haqqında  ',
@@ -28,12 +78,12 @@ class _HomePageState extends State<HomePage>
     super.dispose();
   }
 
-  @override
+  /* @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_handleTabSelection);
     super.initState();
-  }
+  }*/
 
   _handleTabSelection() {
     if (_tabController.indexIsChanging) {
@@ -43,11 +93,9 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
-     super.build(context);
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]);
+    super.build(context);
 
+    
     var size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -63,9 +111,10 @@ class _HomePageState extends State<HomePage>
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 IconButton(
-                  icon: Icon(Icons.info_outline),
+                  icon: Icon(Feather.info),
+                  color: Colors.grey[850],
                   onPressed: () {
-                    //Navigator.push(context,MaterialPageRoute(builder: (context) => About()));
+                    Navigator.push(context,MaterialPageRoute(builder: (context) => About()));
                   },
                 ),
               ],
@@ -78,15 +127,16 @@ class _HomePageState extends State<HomePage>
               left: 17,
               //  top: 10,
             ),
-            width: size.width - 60,
-            height: 379,
+            //width: size.width,
+            height: size.height * 0.5,
             child: Stack(
+              alignment: Alignment.topCenter,
               children: <Widget>[
                 Container(
                   margin: EdgeInsets.only(top: 45),
                   width: double.infinity,
                   //  width: 400,
-                  height: 310,
+                  height: size.height *  0.43,
                   decoration: BoxDecoration(
                     color: Colors.grey[50],
                     borderRadius: BorderRadius.circular(10),
@@ -132,10 +182,11 @@ class _HomePageState extends State<HomePage>
                 ),
                 Positioned(
                     //top: 0,
-                    left: 77,
+                   // width: MediaQuery.of(context).size.width,
                     //right: 30,
                     child: Container(
-                      height: MediaQuery.of(context).size.height * 0.33,
+                      
+                      height: MediaQuery.of(context).size.height * 0.34,
                       width: MediaQuery.of(context).size.width * 0.5,
                       child: Container(
                         margin: EdgeInsets.only(
@@ -154,7 +205,7 @@ class _HomePageState extends State<HomePage>
                                     color: Colors.grey.withOpacity(0.4),
                                     blurRadius: 40,
                                     offset: Offset(3, 3),
-                                    spreadRadius: 10,
+                                    spreadRadius: 7,
                                   ),
                                 ],
                               ),
@@ -173,9 +224,9 @@ class _HomePageState extends State<HomePage>
                                 borderRadius: BorderRadius.circular(14),
                                 gradient: new LinearGradient(
                                   colors: [
-                                    Colors.grey.withOpacity(0.14),
+                                    Colors.grey.withOpacity(0.145),
                                     Colors.transparent,
-                                    Colors.grey.withOpacity(0.14),
+                                    Colors.grey.withOpacity(0.145),
                                   ],
                                   begin: Alignment.centerLeft,
                                   end: Alignment.centerRight,
@@ -189,7 +240,22 @@ class _HomePageState extends State<HomePage>
               ],
             ),
           ),
-
+          Padding(
+            padding: const EdgeInsets.only(top :13.0),
+            child: Container(
+              child: Center(
+                child: Text(
+                  "Oxumaq üçün arxaplan rejimi seçin:",
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14.2,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(top: 10),
             child: Row(
@@ -203,14 +269,25 @@ class _HomePageState extends State<HomePage>
 
                     //side: BorderSide(color: Colors.blue),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    
+                   // SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top]);
+                    if (whitepathPDF != null || whitepathPDF.isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PdfWhite(pathwhite: whitepathPDF),
+                        ),
+                      );
+                    }
+                  },
                   color: Colors.white,
                   textColor: Colors.blue,
                   child: Row(
                     //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Oxu",
+                        "Açıq",
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 14,
@@ -227,11 +304,22 @@ class _HomePageState extends State<HomePage>
                     borderRadius: BorderRadius.circular(4.0),
                     //side: BorderSide(color: Colors.red),
                   ),
-                  onPressed: () {},
+                  onPressed: ()  {
+                     // SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top]);
+                    if (blackpathPDF != null || blackpathPDF.isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PdfBlack(pathblack: blackpathPDF),
+                        ),
+                      );
+                     
+                    }
+                  },
                   color: Colors.blue[900],
                   textColor: Colors.white,
                   child: Text(
-                    "Oxu",
+                    "Tünd",
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 14,
@@ -251,7 +339,7 @@ class _HomePageState extends State<HomePage>
               color: Colors.grey[200],
               child: TabBar(
                 //isScrollable: true,
-                
+
                 physics: ScrollPhysics(),
                 labelStyle: TextStyle(
                   fontFamily: 'Poppins',

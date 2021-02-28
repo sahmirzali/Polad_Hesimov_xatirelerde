@@ -1,9 +1,14 @@
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
+	localPropertiesFile.withReader('UTF-8') { reader ->
+    localProperties.load(reader)
+	}
+}
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+	keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
 def flutterRoot = localProperties.getProperty('flutter.sdk')
@@ -39,19 +44,35 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.mirze.general_polad"
-        minSdkVersion 16
-        targetSdkVersion 28
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        minSdkVersion 18
+        targetSdkVersion 29
+        versionCode 5
+        versionName "1.0.5"
+        //versionCode flutterVersionCode.toInteger()
+        //versionName flutterVersionName
     }
 
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
-        }
+     signingConfigs {
+   	   release {
+       keyAlias keystoreProperties['keyAlias']
+       keyPassword keystoreProperties['keyPassword']
+       storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+       storePassword keystoreProperties['storePassword']
+   	}
+}
+buildTypes {
+   release {
+
+        signingConfig signingConfigs.release
+
+        minifyEnabled true
+        useProguard true
+
+        proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
     }
+
+ }
 }
 
 flutter {
